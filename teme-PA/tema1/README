@@ -1,0 +1,173 @@
+// Copyright 2021 - 2022 321CA Mihai Daniel Soare
+
+# nu-mi plac literele mari
+
+Proiectarea Algoritmilor
+
+Tema #1 Gigel si noile sale aventuri
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**) Cum se ruleaza verificarea?
+
+- se poate da ./check pentru verificarea tuturor task-urilor sau ./check "nume_executabil"
+pentru a verifica unul dintre exercitiile rezolvate.
+
+
+!!) Structura task-uri
+
+- am folosit scheletul de laborator pentru a crea o structura, fiecare task are in metoda
+main crearea unui obiect de tip Task si dupa se ruleaza metoda Task::solve() pentru a rezolva 
+task-ul respectiv.
+
+`Task::solve()`
+
+- are in strucuctura citirea inputului si printarea outputului: in citirea inputului sunt luate
+datele de intrarea dintr-un fisier text, iar in printarea outputului se rezolva problema si se
+scriu raspunsurile intr-un fisier text.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Problema 1) Gigel si tabelele Walsh
+
+- problema a fost rezolvata folosind metoda Divide et Impera.
+
+- principiul care sta la baza rezolvarii acestei probleme este descoperirea intervalelor celor 4
+cadrane in care se pot afla niste coordonate, zoomarea intr-unul dintre cadrane si care este
+cazul de baza la care sa se opreasca algoritmul folosit.
+
+- exista cele 4 cadrane in care se poate afla doua coordonate initiale x si y, iar scopul
+algoritmului este sa se reduca matricea initiala de N x N, la o matrice de 2 x 2 in care
+se stiu toate valorile celor 4 puncte (0 0; 0 1).
+
+- se face acest lucru pornind de la matricea de la N x N, ca mai apoi sa se reduca coordonatele
+cautate x si y in functie de cadranul in care se afla prin reducerea lui x sau/si y cu lungimea
+actuala a matricei.
+
+- cand se ajunge la cazul de baza, va intoarce 0 sau 1 in functie de cum au ajuns coordonatele
+in acel moment si in functie de ce cadrane au fost parcurse in urma apelarii algoritmului.
+
+Complexitate temporala: O(n) // unde n este lungimea unei linii / coloane
+Complexitate spatiala: O(2 * k) // unde k numarul de perechi x, y
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Problema 2) Gigel si cuvintele criptate
+
+- problema a fost rezolvata folosind metoda Greedy.
+
+- primul pas a fost sa fie adaugate toate literele diferite intr-un hashmap, astfel incat sa existe
+o evidenta a literelor diferite;
+
+- iar apoi pentru gasirea numarului maxim de cuvinte care pot fi combinate care contin o litera
+dominanta, s-a apelat algoritmul care urmeaza a fi prezentat pe toate literele diferite gasite
+anterior;
+
+- al doilea pas in rezolvarea problemei, a fost crearea algoritmului:
+
+- se sorteaza sirul de cuvinte descrescator dupa diferenta de aparatii a literei
+dominante si a literelor diferite de aceasta;
+
+- se parcurge fiecare cuvant din sir si se verifica daca se poate lua in considerare
+in combinarea intr-un nou cuvant;
+
+- poate fi combinat, doar daca nr de aparitii ale literei dominante + aparitiile anteriore ale
+acesteia este mai mare decat jumatatea noului cuvant format;
+
+Complexitate temporala: O(no_lett * nlog(n * length)) + O(no_lett * n * length)
+// no_lett numarul de litere diferite care apar printre cuvintele din sirul de cuvinte
+// n numarul de cuvinte din sir
+// length numarul de litere dintr-un cuvant
+
+Complexitate spatiala: O(n) + O(no_lett) => O(n) // unde n este numarul de cuvinte si no_lett
+numarul de litere diferite
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Problema 3) Gigel si Prinel
+
+- problema a fost rezolvata folosind Programare Dinamica.
+
+- primul pas a fost citirea datelor de intrare si crearea unui sir care sa contina numarul de 
+miscari de la numarul maxim cautat in sirul de targets pana la 1
+
+- iar ulterior, am folosit o matrice dp pentru gasirea numarului de puncte maxim care pot fi
+primite de Prinel in urma miscarilor realizate care are doar 2 linii si k coloane;
+
+- in primul rand, trebuie calculat numarul minim de miscari pentru a ajunge de la 1 la toate
+numerele mai mici decat numarul maxim din sirul de targets;
+
+obs: daca un numar x este divizibil cu div, atunci si x - div este divizibil cu acelasi div,
+de aceea obtinem urmatoarea formula de recursivitate:
+    dist[i] = min(dist[i - div] + 1), div find oricare dintre divizorii lui i;
+
+- dupa calcularea sirului de solutii, se verifica daca nu cumva se pot face toate miscarile
+caz in care se returneaza direct toate punctele disponibile
+
+- altfel, se aplica acelasi principiu de la problema rucsacului doar ca pentru problema noastra
+doar ca numarul de miscari pentru un obiectiv este greutatea lui, iar numarul maxim de miscari
+reprezinta greutatea rucascului;
+
+Complexitate temporala: O(max_target * sqrt(max_target)) + O(n * k) // k = numarul maxim de miscari
+Complexitate spatiala: O(max_target) + 2 * O(n) + O(2 * n) // unde max_target, nr maxim din targets
+iar n este numarul de elemente din sirul de targets / awards
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Problema 4) Gigel si cheia de la portofel
+
+- problema a fost rezolvata folosind Programare Dinamica.
+
+- primul pas il reprezinta gasirea numarului de litere diferite din cheia principala, realizand
+un vector de frecventa al aparitiilor literelor din subsir, deoarece este folosit ulterior
+
+- al doilea pas il reprezinta gasirea cazului de baza pentru matricea de subsecvente gasite,
+care are pe linii nr de litere din subsir, iar pe coloane numarul de litere din cheie;
+
+- acesta este introdus pe prima linie din matrice fiind numarul maxim de subsecvente care pot fi
+gasite in functie de numarul de litere diferite din sirul total si de numarul de semne de intrebare
+intalnite pana la pasul respectiv;
+
+- practic pentru fiecare coloana de pe linia 0, vom avea ridicarea la putere a numarului
+de litere diferite si numarul de aparaitii ale semnului ? pana la pasul respectiv;
+
+- in ultimul rand se parcurge matricea dp pe linii si coloane (i este indexul curent din substring
+iar j este indexul curent din cheie)
+- se calculeaza numarul de subsecvente care pot fi numarate in functie de:
+    (1) daca ultimele litere din subsiruri coincid se pot adauga modurile in care se adauga 
+    o noua litera din cheie la subsecventa curenta sau modurile in care se trece mai departe;
+    (2) daca se da peste un semn al intrebarii se multiplica numarul de moduri in care se pot
+    lua subsecvente cu numarul de litere diferite care exista in cheie;
+    (3) daca ultimele doua litere din subsiruri nu coincidi se adauga modurile in care se trece mai
+    departe la o noua litera;
+
+Complexitate temporala: O(l * n) // unde l lungimea subsirului din cheie si n lungimea cheii
+Complexitate spatiala: O(l * n) + O(no_lett) // unde no_lett numarul de litere din alfabetul englez
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Problema 5) Gigel regele comertului
+
+- problema a fost rezolvata folosind Programare Dinamica.
+
+- primul pas il reprezinta gasirea completarea unei matrici dp[i][j] cu numarul maxim de negustori
+care pot fi folositi pentru activarea a oricate j orase din primele i;
+
+I. cazul de baza
+    - in care se completeaza numarul de negustori cand:
+        ~ i < j: 0
+        ~ i == 1: este primul capat si trebuie activat doar capatul din dreapta
+        ~ i == n: este ultimul capat si trebuie actiat doar capatul din stanga
+            se activeaza toate orasele pana la i prin diferenta dintre coord. extrem;
+        ~ i == j: se calculeaza diferenta dintre coord. extremitatilor
+
+II. se pot activa orase atat prin activarea unui singur capat, cat si prin activarea a doua capete
+asadar se face maximul dintre: activarea niciunui capat, activarea unuia sau activarea a doua
+capete
+
+Numerele maxime de negustori vor fi gasite pe ultima linie din matrice, asadar se apeleaza
+un binary search pentru a gasi numarul maxim de negustori care poate fi folosit pentru a activa
+cat mai multe orase (oricare ar fi ele);
+
+Complexitate temporala: O(n * n) // unde n este nr de orase
+Complexitate spatiala: O(n * n)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

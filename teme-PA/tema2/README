@@ -1,0 +1,194 @@
+// Copyright 2021 - 2022 - 321CA - Mihai Daniel Soare
+
+# nu-mi plac literele mari
+
+Proiectarea Algoritmilor
+
+Tema #2 Gigel si grafurile
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**) Cum se ruleaza verificarea?
+
+- se poate da ./check pentru verificarea tuturor task-urilor sau ./check "nr", nr = [1, 4]
+pentru a verifica unul dintre exercitiile rezolvate.
+
+
+!!) Structura task-uri
+
+- am folosit scheletul de laborator pentru a crea o structura, fiecare task are in metoda
+main crearea unui obiect de tip Task si dupa se ruleaza metoda Task::solve() pentru a rezolva 
+task-ul respectiv.
+
+`Task::solve()`
+
+- are in strucuctura citirea inputului si printarea outputului: in citirea inputului sunt luate
+datele de intrarea dintr-un fisier text, iar in printarea outputului se rezolva problema si se
+scriu raspunsurile intr-un fisier text.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Problema 1) Curatare multi-agent
+
+- problema este una care se rezolva prin combinarea a mai multor tehnici de programare, precum
+folosirea algoritmului lee (bfs) pe matrici bidimensionale si backtracking de solutii
+
+__Structura rezolvarii__
+
+1. se prelucreaza inputul si se stocheaza in diferite structuri de date;
+    - se pastreaza o matrice reprezentand grid-ul dat
+    - o matrice reprezentand costurile parcurgerii grid-ului dintr-un punct in altul
+    costuri = distante
+    - un vector de robots
+    - un vector de suprafete care trebuie curatate
+
+2. se trece la rezolvarea propriu zisa:
+
+    a) generarea costurilor
+
+- se va folosi algoritmul lui lee din fiecare robot pentru a afla costul parcurgerii gridului
+de la un robot pana la un alt robot, robot -> suprafata
+- se foloseste algoritmul lui lee si pentru a calcula distanta din fiecare suprafata pana la fiecare
+suprafata
+
+- aceste 3 aspecte importante vor fi pastrate intr-o matrice de 9 x 9 numita robo_dist:
+  -> va avea pe idx-urile:
+    i = [1, 4] | j = [1, 4] doar distante intre roboti <-> roboti
+    i = [1, 4] | j = [5, 8] doar distante intre roboti <-> suprafete
+    i = [5, 8] | j = [5, 8] doar distante intre suprafete <-> suprafete
+
+    b) realizarea distributiei
+
+- se va folosi o metoda de backtracking pentru a genera toate distributiile posibile ale
+suprafetelor care trebuie curatate pentru toti robotii:
+
+- primul pas este generarea unei solutii valide
+- al doilea pas este verificarea daca solutia generata este cea mai buna (adica are costul minim)
+- se face asta prin aflarea distantei maxime pe care o poate face un robot pana la toate
+suprafetele
+care i-au fost distribuite (astfel vom sti cand s-a terminat camera de curatat)
+- se compara toate aceste distante de la roboti pana la toate suprafetele disponibile
+- se descopera acel minim global in functie de cel mai lung timp de terminare a camerei per
+distributie
+
+Complexitate temporala: O(n * m) // n = nr de linii, m = nr de coloane -> pt lee
+    conteaza doar complexitatea unui lee, deoarece restul sunt valori constante
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Problema 2) Fortificatii
+
+- problema se rezolva prin folosirea algoritmului lui Dijkstra pentru capitala (nodul de inceput)
+si dupa se extrag distantele dintre localitatile de barbari si capitala pe drumurile care nu au
+vecin direct o localitate de barbari;
+
+__Structura rezolvarii__
+
+1. se prelucreaza inputul si se stocheaza in diferite structuri de date;
+    - n = nr de localitati, m - numar de muchii intre elemente
+    - k = nr de fortificatii maxime pe care le putem adauga
+    - is_barb un vector de frecventa pentru a sti pentru fiecare localitate daca este
+    a barbarilor sau nu
+    - matricea grafului formata prin liste de adiacenta, fiecare element din lista avand si
+    costul salvat (pentru a merge din nodul x in nodul y)
+    - o coada de prioritati continand perechi de distante si noduri (distantele sunt negative
+    pentru) a putea folosi un min heap direct
+    - un vector de distante pentru a salva toate drumurile valide de la barbari catre capitale
+    pe care se vor pune fortificatii
+
+2. rezolvarea problemei:
+
+    a) folosirea algoritmului lui Dijkstra
+        -   se vor parcurge toate nodurile si se vor relaxa si se vor calcula doar costurile pentru
+        muchiile care nu sunt localitati de barbari
+        - dupa calcularea distantelor de la localitati pana la capitala se modifica vectorul de
+        distante pentru localitati de barbari pentru a avea valoare -1
+    
+    b) calcularea distantei de la localitati de barbari pana la capitala
+        - se parcurg nodurile de barbari si se verifica daca nu cumva un drum de la localitatea de
+        barbar pana la capitala nu are fix primul vecin un barbar, deoarece astfel nu ar avea sens sa
+        adaugam fortificatii pe drumul respectiv
+        - se adauga toate aceste distante intr-un vector
+    
+    c) sortarea vectorului de distante de la barbari pana la capitala crescator
+
+    d) calcularea costului minim pentru un drum dupa adaugarea tuturor fortificatiilor
+        - se va tine un contor pentru a sti pe cate drumuri trebuie adaugate fortificatii
+        - se parcurg toate distantele si se calculeaza un factor dintre elementele succesive
+        - daca se pot pune fortificatii se vor adauga fortificatii pe toate drumurile cunoscute
+        - daca nu se mai pot pune destule forti. pe toate drumurile cunoscute punem doar fractionar
+
+    obs. daca am parcurs tot vectorul de distante si tot mai avem fortificatii disponibile,
+    se incearca adaugarea de fortificatii / nr de drumuri contorizate
+
+probleme intalnite: long long pentru costuri / distante deoarece erau drumuri mult mai mari
+
+Complexitate temporala: O(m + nlogn) // pentru dijkstra, m = nr de muchii, n = nr de noduri
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Problema 3) Beamdrone
+
+- problema este una care se rezolva prin folosirea algoritmului lui lee modficat pe un grid 2D
+
+__Structura rezolvarii__
+
+1. se prelucreaza inputul si se stocheaza in diferite structuri de date;
+    - se pastreaza o matrice reprezentand grid-ul dat
+    - o matrice reprezentand costurile parcurgerii grid-ului dintr-un punct in altul
+    costuri = distante
+    - indexii de inceput si de end al dronei
+
+2. rezovlare:
+
+    a) adaugarea nodului de inceput in coada pe 2 directii, perpendiculare;
+
+        - se parcurge coada de noduri in care vom salva atat indexii nodului respectiv, cat si
+        directia inspre care se indreapta parcurgerea, ex. daca vine de jos, se va duce in directia UP
+
+    b) pentru fiecare nod scos din coada, incercam sa mergem doar pe directiile perpendiculare ale
+        acestora (daca se indreapte spre sus, va putea merge doar stanga si dreapta)
+
+    c) cand se parcurge o directie perpendiculara se va merge pana cand a iesit din grid,
+        a dat de primul zid sau daca costul este mai prost decat ce exista deja pentru pozitia respectiva
+        => adica deja exista un drum cel mai bun folosind acea patratica
+        - de asemenea, daca urm patratica de pe directia perp. este valida, se va calcula noul cost
+        si se va adauga la randul lui in coada pe directia pe care va merge;
+
+    d) se repeta si pe cealalta directie perpendiculara
+
+    e) la final se va afla costul minim pana la end point direct la pozitia end pointului in
+    matricea costului
+
+Complexitate temporala: O(n * m) // n = nr de linii, m = nr de coloane -> pt lee
+    nu se schimba complexitatea fata de un lee normal deoarece se schimba doar ordinea de vizitare
+    a nodurilor
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Problema 4) Curse
+
+- problema este una care se rezolva prin prelucrarea inputului intr-un graf si dupa folosirea unui
+algoritm pentru calcularea unei sortari topologice
+
+__Structura rezolvarii__
+
+1. 
+    a) se prelucreaza inputul si se stocheaza in diferite structuri de date;
+    - p = nr de piste, m = nr de masini, a = nr de antrenamente;
+    - un array de set-uri neordonate pentru a nu pastra in graf conditii care au fost puse deja
+    - un vector de grade interne folosit pentru algoritmul lui khan
+
+    b) se citesc cate 2 antrenamente si se pun in graf conditia extrasa din cele 2 antrenamente
+    + se verifica daca nu cumva a fost pusa deja intr-un antrenament anterior
+
+2. rezovlare:
+
+    a) dupa ce exista graful se aplica algoritmul lui khan pentru topological sort, iar la final
+    se va afisa direct drumul care a rezultat
+
+Complexitate temporala: O(a * p) // prelucrarea inputului
+    + O(a + m) // de la topological sort
+    unde m = nr de masini si a = nr de antr.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
